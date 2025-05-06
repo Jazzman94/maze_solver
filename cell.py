@@ -1,11 +1,13 @@
-from ui import Window, Point, Line
+from ui import Line, Point
+
 
 class Cell:
-    def __init__(self, win: Window = None):
+    def __init__(self, win=None):
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
         self.has_bottom_wall = True
+        self.visited = False
         self._x1 = None
         self._x2 = None
         self._y1 = None
@@ -43,24 +45,19 @@ class Cell:
         else:
             line = Line(Point(x1, y2), Point(x2, y2))
             self._win.draw_line(line, "white")
-    
-    def center(self) -> Point:
-        if self._x1 is None or self._x2 is None or self._y1 is None or self._y2 is None:
-            raise ValueError("Cell coordinates are not set.")
-        x_center = self._x1 + (self._x2 - self._x1) // 2
-        y_center = self._y2 + (self._y1 - self._y2) // 2
-        return Point(x_center, y_center)
-    
-    def draw_move(self, to_cell: 'Cell', undo=False):
-        color = "red"
+
+    def draw_move(self, to_cell, undo=False):
+        half_length = abs(self._x2 - self._x1) // 2
+        x_center = half_length + self._x1
+        y_center = half_length + self._y1
+
+        half_length2 = abs(to_cell._x2 - to_cell._x1) // 2
+        x_center2 = half_length2 + to_cell._x1
+        y_center2 = half_length2 + to_cell._y1
+
+        fill_color = "red"
         if undo:
-            color = "gray"
-        
-        cell_center = self.center()
-        other_center = to_cell.center()
+            fill_color = "gray"
 
-        line = Line(cell_center, other_center)
-        self._win.draw_line(line, color)
-
-
-        
+        line = Line(Point(x_center, y_center), Point(x_center2, y_center2))
+        self._win.draw_line(line, fill_color)
